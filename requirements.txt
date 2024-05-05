@@ -1,0 +1,6 @@
+streamlit
+folium
+geopandas
+streamlit_folium
+pillow
+selenium
