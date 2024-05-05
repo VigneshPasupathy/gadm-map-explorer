@@ -1,3 +1,16 @@
+---
+title: gadm-map-explorer
+emoji: 🗺️
+colorFrom: yellow
+colorTo: blue
+sdk: streamlit
+sdk_version: 1.34.0
+app_file: app.py
+pinned: false
+license: mit
+---
+
+
 # GADM India District Map
 
 Interactively explore GADM data using Streamlit, and Folium.

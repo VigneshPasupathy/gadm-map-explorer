@@ -22,14 +22,14 @@ BOUNDARY_STYLES = {
 
 MARKER_STYLES = {
     'Default': {
-        'radius': 5,
+        'radius': 2,
         'color': 'black',
-        'fill': False,
+        'fill': True,
         'fill_color': 'transparent',
-        'fill_opacity': 0.8
+        'fill_opacity': 1
     },
     'Style1': {
-        'radius': 5,
+        'radius': 2,
         'color': 'blue',
         'fill': True,
         'fill_color': 'white',

@@ -2,10 +2,10 @@ import streamlit as st
 import folium
 import geopandas as gpd
 from streamlit_folium import st_folium, folium_static
-from PIL import Image
 import io
-from styles.styles import MAP_STYLES, BOUNDARY_STYLES, MARKER_STYLES
-import constants
+from helpers.style import MAP_STYLES, BOUNDARY_STYLES, MARKER_STYLES
+from helpers.converter import convert_map_to_png
+import helpers.constants as constants
 
 def add_district_layer(map_obj, style, district, district_name):
     bounds = district.total_bounds
@@ -14,11 +14,19 @@ def add_district_layer(map_obj, style, district, district_name):
     return map_obj, bounds, district_coords
 
 def add_location_markers(map_obj, style, points):
-    for i, point in enumerate(points, start=1):
-        lat, lon = point
+    for point in points:
+        name, lat, lon = point
         folium.CircleMarker(
             location=[lat, lon],
             **MARKER_STYLES[style]
+        ).add_to(map_obj)
+        folium.Marker(
+            location=[lat, lon],
+            icon=folium.DivIcon(
+                icon_size=(150, 36),
+                icon_anchor=(0, 0),
+                html=f'<div style="font-size: 8pt; color: black; font-family: Arial; font-weight: bold;">{name}</div>'
+            )
         ).add_to(map_obj)
     return map_obj
 
@@ -58,22 +66,8 @@ def display_header():
     st.markdown(f"<h1 style='text-align: center; margin-bottom: 1rem;'>{constants.TITLE}</h1>", unsafe_allow_html=True)
 
 
-def convert_map_to_png(progress_bar, map_obj, width, height):
-    img_data = map_obj._to_png()
-    progress_bar.progress(0.5)
-    bytes_io = io.BytesIO()
-    img = Image.open(io.BytesIO(img_data))
-    progress_bar.progress(0.6)
-    img = img.resize((width, height), resample=Image.LANCZOS)
-    progress_bar.progress(0.8)
-    img.save(bytes_io, format='PNG')
-    progress_bar.progress(0.9)
-    return bytes_io.getvalue()
-
-def download_png(gadm_data, district_name, points, map_style, map_width, map_height):
-    progress_bar = st.progress(0.0)
-    map_obj = create_map(gadm_data, district_name, points, map_style)
-    progress_bar.progress(0.3)
+def download_png(map_obj,district_name, map_width, map_height):
+    progress_bar = st.progress(0.2)
     png_bytes = convert_map_to_png(progress_bar, map_obj, map_width, map_height)
     progress_bar.empty()
 
@@ -81,13 +75,14 @@ def download_png(gadm_data, district_name, points, map_style, map_width, map_hei
     st.download_button(
             label=constants.DOWNLOAD_READY,
             data=png_bytes,
-            file_name=f'{district_name}_{map_width}_X_{map_height}.png',
+            file_name=f'{district_name}.png',
             mime='image/png',
             key='download_button')
 
 def main():
     reduce_spacing()
     display_header() 
+    map_obj = None
 
     # Load the GeoPackage file
     gadm_data = gpd.read_file(constants.GADM_FILE)
@@ -102,15 +97,18 @@ def main():
         map_height = st.slider(constants.HEIGHT_LABEL, value=450, min_value=100, max_value=1000, step=50)
         points_input = st.text_area(constants.POINTS_LABEL, constants.DEFAULT_POINTS)
         try:
-            points = [tuple(map(float, point.strip().split(','))) for point in points_input.split(';')]
+            points = [tuple(point.strip().split(',')) for point in points_input.split(';')]
+            points = [(name.strip(), float(lat), float(lon)) for name, lat, lon in points]
         except ValueError:
             points = []
         if st.button(constants.EXPORT_AS_PNG):
-                download_png(gadm_data, district_name, points, map_style, map_width, map_height)
+                print(st.session_state.map_obj)
+                download_png(st.session_state.map_obj,district_name, map_width, map_height)
         
     with col2:
-            map_obj = create_map(gadm_data, district_name, points, map_style)
-            folium_static(map_obj, width=map_width, height=map_height)
+            st.session_state.map_obj = create_map(gadm_data, district_name, points, map_style)
+            print("Map Obj Assigned")
+            folium_static(st.session_state.map_obj, width=map_width, height=map_height)
 
 if __name__ == '__main__':
     main()
