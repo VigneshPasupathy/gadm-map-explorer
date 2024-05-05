@@ -11,16 +11,21 @@ license: mit
 ---
 
 
-# GADM India District Map
+# Motivation
 
-Interactively explore GADM data using Streamlit, and Folium.
+
+The GADM (Database of Global Administrative Areas) dataset provides detailed administrative boundaries data for countries and their subdivisions globally. This comprehensive dataset is available in common GIS file formats like shapefiles, GeoPackage, and GeoJSON.
+
+This repo aims to explore and work with the GADM dataset, utilizing its administrative boundaries information for various geospatial analyses and visualizations.
+
 
 ## Features
 
 - Select districts
-- Customize map style
+- Customize map style (Original, Outline)
 - Add markers
 - Adjust map size
+- Export PNG
 
 ## Supported Countries
 - India
@@ -42,7 +47,7 @@ Interactively explore GADM data using Streamlit, and Folium.
 - GADM dataset: `gadm41_IND_3.json`
 
 ## For a new country
-- Download the json from https://gadm.org/download_country.html
+- Download the json from [GADM](https://gadm.org/download_country.html)
 - Add to the data directory
 - Replace the input source in app.py
 
@@ -52,6 +57,9 @@ Interactively explore GADM data using Streamlit, and Folium.
 - Folium
 - GeoPandas
 - streamlit_folium
+
+## Live Demo
+[Hugging Face Space](https://huggingface.co/spaces/VigneshPasupathyHF/gadm-map-explorer)
 
 ## Contributing
 
