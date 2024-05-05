@@ -4,3 +4,4 @@ geopandas
 streamlit_folium
 pillow
 selenium
+pandas
